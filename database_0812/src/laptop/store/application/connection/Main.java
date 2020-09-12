@@ -1,6 +1,8 @@
 package laptop.store.application.connection;
 
+import laptop.store.application.CounterModel;
 import laptop.store.application.LaptopStoreModel;
+import laptop.store.application.StatisticModel;
 import laptop.store.application.service.LaptopStoreService;
 
 import java.sql.Connection;
@@ -24,26 +26,49 @@ public class Main {
         Connection connection = null;
         try {
             connection = DriverManager
-                    .getConnection("jdbc:mysql://localhost:3306/store_cms_plusplus" +
-                                    "?characterEncoding=UTF-8&autoReconnect=true&connectTimeout=30000&socketTimeout=30000&serverTimezone=UTC\n",
+                    .getConnection("jdbc:mysql://127.0.0.1:3306/store_cms_plusplus?characterEncoding=UTF-8&autoReconnect=true&connectTimeout=30000&socketTimeout=30000&serverTimezone=UTC",
                             "root", "truonggiang3920");
             System.out.println("SQL Connection to database established!");
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Connection Failed! Check output console");
+            System.out.println(e);
+            return;
         }
-        Scanner scanner = new Scanner(System.in);
         LaptopStoreService laptopStoreService = new LaptopStoreService(connection);
-        ArrayList<LaptopStoreModel> result = laptopStoreService.searchLaptop(1000f, null, "APPLE",
-                null, null,null, null, null, 50, "DESC");
-        for (LaptopStoreModel laptopStoreModel : result)
-        {
-            laptopStoreModel.toString();
+        System.out.println("_________________________________Request 1_____________________________________________");
+        ArrayList <LaptopStoreModel> results = laptopStoreService.searchLaptop("10000000","30000000",
+                null,null,null
+                ,null,null,null,null,"DESC");
+        for(LaptopStoreModel laptopStoreModel : results){
+            System.out.println(laptopStoreModel.toString());
         }
-        System.out.println("-------------------------------------------------------------------");
-        List<LaptopStoreModel> result2 = laptopStoreService.findLaptopBySold();
-        for(LaptopStoreModel laptopStoreModels : result)
+        System.out.println("_________________________________Request 2_____________________________________________");
+        ArrayList <LaptopStoreModel> result2 = laptopStoreService.findLaptopBySold();
+        for(LaptopStoreModel laptopStoreModels : result2)
         {
-            laptopStoreModels.toString();
+            System.out.println(laptopStoreModels.toString());
         }
+        System.out.println("_________________________________Request 3_____________________________________________");
+        ArrayList <CounterModel> result3 = laptopStoreService.getCounterByMaker();
+        for (CounterModel counterModel : result3 )
+        {
+            System.out.println(counterModel.getMaker() + "\t" + counterModel.getQuantity());
+        }
+        System.out.println("_________________________________Request 4_____________________________________________");
+        ArrayList <StatisticModel> result4 = laptopStoreService.getStatisticByMaker();
+        for (StatisticModel statisticModel : result4)
+        {
+            System.out.println(statisticModel.getMaker() + "\t" + statisticModel.getSold() + "\t" + statisticModel.getTotalMoney());
+        }
+        System.out.println("_________________________________Request 5_____________________________________________");
+        laptopStoreService.insertLaptop(7, "Laptop Lenovo Yoga S740-14IIL-81RS0036VN (14\" FHD/i5-1035G4/8GB/512GB SSD/Iris Plus/Win10/1.5 kg)",
+                "https://phongvu.vn/may-tinh-xach-tay-laptop-lenovo-yoga-s740-14iil-81rs0036vn-i5-1035g4-xam-s191100012.html", "LENOVO",
+                "Yoga S740-14IIL", "8GB", "Intel Core i5-1035G4", "512GB", null, "23690000", "Intel Iris Plus Graphics",
+                "1920 x 1080", "14", 28);
+        System.out.println("Thêm mới laptop thành công!");
+        System.out.println("_________________________________Request 6_____________________________________________");
+        laptopStoreService.updateSoldLatptop(1,2);
+        System.out.println("Cập nhật số lượng laptop đã bán thành công!");
     }
 }
